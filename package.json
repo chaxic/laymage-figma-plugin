@@ -1,0 +1,14 @@
+{
+  "name": "figma-masonry-layout-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.109.0",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.7.2"
+  }
+}

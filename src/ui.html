@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 12px;
+        color: var(--figma-color-text, #333);
+      }
+      body {
+        margin: 0;
+        padding: 12px;
+      }
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+      .row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      input[type="number"] {
+        box-sizing: border-box;
+        padding: 6px 8px;
+        border: 1px solid var(--figma-color-border, #ccc);
+        border-radius: 4px;
+        background: var(--figma-color-bg, #fff);
+        color: inherit;
+      }
+      button {
+        width: 100%;
+        padding: 8px;
+        margin-top: 4px;
+        border: none;
+        border-radius: 4px;
+        background: var(--figma-color-bg-brand, #0d99ff);
+        color: var(--figma-color-text-onbrand, #fff);
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .hint {
+        margin-top: 10px;
+        color: var(--figma-color-text-secondary, #666);
+        line-height: 1.4;
+      }
+      details.plugin-group {
+        border: 1px solid var(--figma-color-border, #ccc);
+        border-radius: 4px;
+        margin: 0;
+        overflow: hidden;
+      }
+      details.plugin-group summary {
+        font-weight: 500;
+        padding: 8px 10px;
+        cursor: pointer;
+        user-select: none;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      details.plugin-group summary::-webkit-details-marker {
+        display: none;
+      }
+      details.plugin-group summary::before {
+        content: "";
+        display: block;
+        flex-shrink: 0;
+        width: 0;
+        height: 0;
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+        border-left: 9px solid var(--figma-color-text, #333);
+        opacity: 0.85;
+        transition: transform 0.15s ease;
+        transform-origin: 40% 50%;
+      }
+      details.plugin-group[open] summary::before {
+        transform: rotate(90deg);
+      }
+      details.plugin-group .group-body {
+        padding: 8px 10px 10px;
+        border-top: 1px solid var(--figma-color-border, #ccc);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .labeled-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .labeled-row label {
+        margin: 0;
+        font-weight: 500;
+        flex-shrink: 0;
+      }
+      .labeled-row input[type="number"] {
+        flex: 1;
+        min-width: 0;
+        width: auto;
+      }
+      .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .checkbox-row label {
+        margin: 0;
+        font-weight: 500;
+        flex: 1;
+      }
+      .checkbox-row input[type="checkbox"] {
+        flex-shrink: 0;
+      }
+      .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .radio-option label {
+        margin: 0;
+        font-weight: 400;
+        flex: 1;
+      }
+      .radio-option input[type="radio"] {
+        flex-shrink: 0;
+      }
+      #gapSplitSection,
+      #gapUnifiedSection {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row">
+      <div class="labeled-row">
+        <label for="columns">Columns</label>
+        <input id="columns" type="number" min="1" max="24" value="3" />
+      </div>
+      <div class="checkbox-row">
+        <label for="uniformColumns">Uniform columns</label>
+        <input id="uniformColumns" type="checkbox" />
+      </div>
+      <div class="checkbox-row">
+        <label for="detectColumns">Detect columns</label>
+        <input id="detectColumns" type="checkbox" />
+      </div>
+    </div>
+    <div class="row">
+      <div id="gapSplitSection">
+        <div class="labeled-row">
+          <label for="gapX">Horizontal gap</label>
+          <input id="gapX" type="number" min="0" max="999" value="16" />
+        </div>
+        <div class="labeled-row">
+          <label for="gapY">Vertical gap</label>
+          <input id="gapY" type="number" min="0" max="999" value="16" />
+        </div>
+      </div>
+      <div id="gapUnifiedSection" style="display: none">
+        <div class="labeled-row">
+          <label for="gapAll">Gap</label>
+          <input id="gapAll" type="number" min="0" max="999" value="16" />
+        </div>
+      </div>
+      <div class="checkbox-row">
+        <label for="uniformGaps">Uniform gaps</label>
+        <input id="uniformGaps" type="checkbox" />
+      </div>
+    </div>
+    <div class="row">
+      <details class="plugin-group" open>
+        <summary>Arrange by</summary>
+        <div class="group-body">
+          <div class="radio-option">
+            <label for="fillNearestWidth">Nearest width</label>
+            <input
+              id="fillNearestWidth"
+              type="radio"
+              name="columnFillMode"
+              value="nearestWidth"
+              checked
+            />
+          </div>
+          <div class="radio-option">
+            <label for="fillNearestColumn">Nearest column</label>
+            <input
+              id="fillNearestColumn"
+              type="radio"
+              name="columnFillMode"
+              value="nearestColumn"
+            />
+          </div>
+        </div>
+      </details>
+    </div>
+    <button id="apply" type="button" disabled>Apply masonry</button>
+    <p class="hint" id="hint">Select at least two layers with the same parent.</p>
+    <script src="ui.js"></script>
+  </body>
+</html>
