@@ -1,215 +1,329 @@
 "use strict";
 (() => {
   // inlined-ui:inlined-ui-html
-  var inlined_ui_html_default = `<!DOCTYPE html>\r
-<html>\r
-  <head>\r
-    <meta charset="utf-8" />\r
-    <style>\r
-      :root {\r
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;\r
-        font-size: 12px;\r
-        color: var(--figma-color-text, #333);\r
-      }\r
-      body {\r
-        margin: 0;\r
-        padding: 12px;\r
-      }\r
-      label {\r
-        display: block;\r
-        margin-bottom: 4px;\r
-        font-weight: 500;\r
-      }\r
-      .row {\r
-        display: flex;\r
-        flex-direction: column;\r
-        gap: 8px;\r
-        margin-bottom: 10px;\r
-      }\r
-      input[type="number"] {\r
-        box-sizing: border-box;\r
-        padding: 6px 8px;\r
-        border: 1px solid var(--figma-color-border, #ccc);\r
-        border-radius: 4px;\r
-        background: var(--figma-color-bg, #fff);\r
-        color: inherit;\r
-      }\r
-      button {\r
-        width: 100%;\r
-        padding: 8px;\r
-        margin-top: 4px;\r
-        border: none;\r
-        border-radius: 4px;\r
-        background: var(--figma-color-bg-brand, #0d99ff);\r
-        color: var(--figma-color-text-onbrand, #fff);\r
-        font-weight: 600;\r
-        cursor: pointer;\r
-      }\r
-      button:disabled {\r
-        opacity: 0.45;\r
-        cursor: not-allowed;\r
-      }\r
-      .hint {\r
-        margin-top: 10px;\r
-        color: var(--figma-color-text-secondary, #666);\r
-        line-height: 1.4;\r
-      }\r
-      details.plugin-group {\r
-        border: 1px solid var(--figma-color-border, #ccc);\r
-        border-radius: 4px;\r
-        margin: 0;\r
-        overflow: hidden;\r
-      }\r
-      details.plugin-group summary {\r
-        font-weight: 500;\r
-        padding: 8px 10px;\r
-        cursor: pointer;\r
-        user-select: none;\r
-        list-style: none;\r
-        display: flex;\r
-        align-items: center;\r
-        gap: 6px;\r
-      }\r
-      details.plugin-group summary::-webkit-details-marker {\r
-        display: none;\r
-      }\r
-      details.plugin-group summary::before {\r
-        content: "";\r
-        display: block;\r
-        flex-shrink: 0;\r
-        width: 0;\r
-        height: 0;\r
-        border-top: 6px solid transparent;\r
-        border-bottom: 6px solid transparent;\r
-        border-left: 9px solid var(--figma-color-text, #333);\r
-        opacity: 0.85;\r
-        transition: transform 0.15s ease;\r
-        transform-origin: 40% 50%;\r
-      }\r
-      details.plugin-group[open] summary::before {\r
-        transform: rotate(90deg);\r
-      }\r
-      details.plugin-group .group-body {\r
-        padding: 8px 10px 10px;\r
-        border-top: 1px solid var(--figma-color-border, #ccc);\r
-        display: flex;\r
-        flex-direction: column;\r
-        gap: 8px;\r
-      }\r
-      .labeled-row {\r
-        display: flex;\r
-        align-items: center;\r
-        gap: 8px;\r
-      }\r
-      .labeled-row label {\r
-        margin: 0;\r
-        font-weight: 500;\r
-        flex-shrink: 0;\r
-      }\r
-      .labeled-row input[type="number"] {\r
-        flex: 1;\r
-        min-width: 0;\r
-        width: auto;\r
-      }\r
-      .checkbox-row {\r
-        display: flex;\r
-        align-items: center;\r
-        gap: 8px;\r
-      }\r
-      .checkbox-row label {\r
-        margin: 0;\r
-        font-weight: 500;\r
-        flex: 1;\r
-      }\r
-      .checkbox-row input[type="checkbox"] {\r
-        flex-shrink: 0;\r
-      }\r
-      .radio-option {\r
-        display: flex;\r
-        align-items: center;\r
-        gap: 8px;\r
-      }\r
-      .radio-option label {\r
-        margin: 0;\r
-        font-weight: 400;\r
-        flex: 1;\r
-      }\r
-      .radio-option input[type="radio"] {\r
-        flex-shrink: 0;\r
-      }\r
-      #gapSplitSection,\r
-      #gapUnifiedSection {\r
-        display: flex;\r
-        flex-direction: column;\r
-        gap: 8px;\r
-      }\r
-    </style>\r
-  </head>\r
-  <body>\r
-    <div class="row">\r
-      <div class="labeled-row">\r
-        <label for="columns">Columns</label>\r
-        <input id="columns" type="number" min="1" max="24" value="3" />\r
-      </div>\r
-      <div class="checkbox-row">\r
-        <label for="uniformColumns">Uniform columns</label>\r
-        <input id="uniformColumns" type="checkbox" />\r
-      </div>\r
-      <div class="checkbox-row">\r
-        <label for="detectColumns">Detect columns</label>\r
-        <input id="detectColumns" type="checkbox" />\r
-      </div>\r
-    </div>\r
-    <div class="row">\r
-      <div id="gapSplitSection">\r
-        <div class="labeled-row">\r
-          <label for="gapX">Horizontal gap</label>\r
-          <input id="gapX" type="number" min="0" max="999" value="16" />\r
-        </div>\r
-        <div class="labeled-row">\r
-          <label for="gapY">Vertical gap</label>\r
-          <input id="gapY" type="number" min="0" max="999" value="16" />\r
-        </div>\r
-      </div>\r
-      <div id="gapUnifiedSection" style="display: none">\r
-        <div class="labeled-row">\r
-          <label for="gapAll">Gap</label>\r
-          <input id="gapAll" type="number" min="0" max="999" value="16" />\r
-        </div>\r
-      </div>\r
-      <div class="checkbox-row">\r
-        <label for="uniformGaps">Uniform gaps</label>\r
-        <input id="uniformGaps" type="checkbox" />\r
-      </div>\r
-    </div>\r
-    <div class="row">\r
-      <details class="plugin-group" open>\r
-        <summary>Arrange by</summary>\r
-        <div class="group-body">\r
-          <div class="radio-option">\r
-            <label for="fillNearestWidth">Nearest width</label>\r
-            <input\r
-              id="fillNearestWidth"\r
-              type="radio"\r
-              name="columnFillMode"\r
-              value="nearestWidth"\r
-              checked\r
-            />\r
-          </div>\r
-          <div class="radio-option">\r
-            <label for="fillNearestColumn">Nearest column</label>\r
-            <input\r
-              id="fillNearestColumn"\r
-              type="radio"\r
-              name="columnFillMode"\r
-              value="nearestColumn"\r
-            />\r
-          </div>\r
-        </div>\r
-      </details>\r
-    </div>\r
-    <button id="apply" type="button" disabled>Apply masonry</button>\r
-    <p class="hint" id="hint">Select at least two layers with the same parent.</p>\r
+  var inlined_ui_html_default = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 12px;
+        color: var(--figma-color-text, #333);
+      }
+      body {
+        margin: 0;
+        padding: 12px;
+      }
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+      .row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      input[type="number"] {
+        box-sizing: border-box;
+        padding: 6px 8px;
+        border: 1px solid var(--figma-color-border, #ccc);
+        border-radius: 4px;
+        background: var(--figma-color-bg, #fff);
+        color: inherit;
+      }
+      button {
+        width: 100%;
+        padding: 8px;
+        margin-top: 4px;
+        border: none;
+        border-radius: 4px;
+        background: var(--figma-color-bg-brand, #0d99ff);
+        color: var(--figma-color-text-onbrand, #fff);
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .hint {
+        margin-top: 10px;
+        color: var(--figma-color-text-secondary, #666);
+        line-height: 1.4;
+      }
+      details.plugin-group {
+        border: 1px solid var(--figma-color-border, #ccc);
+        border-radius: 4px;
+        margin: 0;
+        overflow: hidden;
+      }
+      details.plugin-group summary {
+        font-weight: 500;
+        padding: 8px 10px;
+        cursor: pointer;
+        user-select: none;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      details.plugin-group summary::-webkit-details-marker {
+        display: none;
+      }
+      details.plugin-group summary::before {
+        content: "";
+        display: block;
+        flex-shrink: 0;
+        width: 0;
+        height: 0;
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+        border-left: 9px solid var(--figma-color-text, #333);
+        opacity: 0.85;
+        transition: transform 0.15s ease;
+        transform-origin: 40% 50%;
+      }
+      details.plugin-group[open] summary::before {
+        transform: rotate(90deg);
+      }
+      details.plugin-group .group-body {
+        padding: 8px 10px 10px;
+        border-top: 1px solid var(--figma-color-border, #ccc);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .labeled-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .labeled-row label {
+        margin: 0;
+        font-weight: 500;
+        flex-shrink: 0;
+      }
+      .labeled-row input[type="number"] {
+        flex: 1;
+        min-width: 0;
+        width: auto;
+      }
+      .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .checkbox-row label {
+        margin: 0;
+        font-weight: 500;
+        flex: 1;
+      }
+      .checkbox-row label.video-outline-label {
+        font-weight: 700;
+      }
+      .pre-apply-block {
+        margin-bottom: 8px;
+      }
+      .checkbox-row input[type="checkbox"] {
+        flex-shrink: 0;
+      }
+      .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .radio-option label {
+        margin: 0;
+        font-weight: 400;
+        flex: 1;
+      }
+      .radio-option input[type="radio"] {
+        flex-shrink: 0;
+      }
+      #gapSplitSection,
+      #gapUnifiedSection {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row">
+      <div class="labeled-row">
+        <label for="columns" title="How many columns to flow items into.">Columns</label>
+        <input
+          id="columns"
+          type="number"
+          min="1"
+          max="24"
+          value="3"
+          title="How many columns to flow items into."
+        />
+      </div>
+      <div class="checkbox-row">
+        <label
+          for="uniformColumns"
+          title="Use the same column width for every column (based on the widest header)."
+          >Uniform columns</label
+        >
+        <input
+          id="uniformColumns"
+          type="checkbox"
+          title="Use the same column width for every column (based on the widest header)."
+        />
+      </div>
+      <div class="checkbox-row">
+        <label
+          for="lockBounds"
+          title="Keep the selection\u2019s overall width the same by scaling column widths to fit within the original bounds."
+          >Lock bounds</label
+        >
+        <input
+          id="lockBounds"
+          type="checkbox"
+          title="Keep the selection\u2019s overall width the same by scaling column widths to fit within the original bounds."
+        />
+      </div>
+      <div class="checkbox-row">
+        <label
+          for="detectColumns"
+          title="Auto-set Columns based on how many selected layers share the top row (same y within 1px). If fewer than two share that row, uses 1."
+          >Detect columns</label
+        >
+        <input
+          id="detectColumns"
+          type="checkbox"
+          title="Auto-set Columns based on how many selected layers share the top row (same y within 1px). If fewer than two share that row, uses 1."
+        />
+      </div>
+    </div>
+    <div class="row">
+      <div id="gapSplitSection">
+        <div class="labeled-row">
+          <label
+            for="gapX"
+            title="Horizontal space between columns, measured between visible stroke edges when strokes are enabled."
+            >Horizontal gap</label
+          >
+          <input
+            id="gapX"
+            type="number"
+            min="0"
+            max="999"
+            value="16"
+            title="Horizontal space between columns, measured between visible stroke edges when strokes are enabled."
+          />
+        </div>
+        <div class="labeled-row">
+          <label
+            for="gapY"
+            title="Vertical space between items in a column, measured between visible stroke edges when strokes are enabled."
+            >Vertical gap</label
+          >
+          <input
+            id="gapY"
+            type="number"
+            min="0"
+            max="999"
+            value="16"
+            title="Vertical space between items in a column, measured between visible stroke edges when strokes are enabled."
+          />
+        </div>
+      </div>
+      <div id="gapUnifiedSection" style="display: none">
+        <div class="labeled-row">
+          <label
+            for="gapAll"
+            title="Single gap value used for both horizontal and vertical spacing."
+            >Gap</label
+          >
+          <input
+            id="gapAll"
+            type="number"
+            min="0"
+            max="999"
+            value="16"
+            title="Single gap value used for both horizontal and vertical spacing."
+          />
+        </div>
+      </div>
+      <div class="checkbox-row">
+        <label
+          for="uniformGaps"
+          title="Use one gap value for both horizontal and vertical gaps."
+          >Uniform gaps</label
+        >
+        <input
+          id="uniformGaps"
+          type="checkbox"
+          title="Use one gap value for both horizontal and vertical gaps."
+        />
+      </div>
+    </div>
+    <div class="row">
+      <details class="plugin-group" open>
+        <summary>Arrange by</summary>
+        <div class="group-body">
+          <div class="radio-option">
+            <label
+              for="fillNearestWidth"
+              title="Assign items to the column whose header width is closest to the item\u2019s current width."
+              >Nearest width</label
+            >
+            <input
+              id="fillNearestWidth"
+              type="radio"
+              name="columnFillMode"
+              value="nearestWidth"
+              checked
+              title="Assign items to the column whose header width is closest to the item\u2019s current width."
+            />
+          </div>
+          <div class="radio-option">
+            <label
+              for="fillNearestColumn"
+              title="Assign items to the nearest column horizontally (based on distance to the column header\u2019s center)."
+              >Nearest column</label
+            >
+            <input
+              id="fillNearestColumn"
+              type="radio"
+              name="columnFillMode"
+              value="nearestColumn"
+              title="Assign items to the nearest column horizontally (based on distance to the column header\u2019s center)."
+            />
+          </div>
+        </div>
+      </details>
+    </div>
+    <div id="videoOutlineRow" class="pre-apply-block" style="display: none">
+      <div class="checkbox-row">
+        <label
+          class="video-outline-label"
+          for="videoOutlineFix"
+          title="FigJam does not expose strokes on video media. Turn on to add 8px outline spacing in gap math so layout matches what you see on the board."
+          >Video Outline Fix</label
+        >
+        <input
+          id="videoOutlineFix"
+          type="checkbox"
+          title="FigJam does not expose strokes on video media. Turn on to add 8px outline spacing in gap math so layout matches what you see on the board."
+        />
+      </div>
+    </div>
+    <button
+      id="apply"
+      type="button"
+      disabled
+      title="Apply the layout to the current selection."
+    >
+      Apply layout
+    </button>
+    <p class="hint" id="hint">Select at least two layers with the same parent.</p>
     <script>
 "use strict";
 (() => {
@@ -225,6 +339,9 @@
   var uniformEl = document.getElementById("uniformColumns");
   var uniformGapsEl = document.getElementById("uniformGaps");
   var detectColumnsEl = document.getElementById("detectColumns");
+  var lockBoundsEl = document.getElementById("lockBounds");
+  var videoOutlineRow = document.getElementById("videoOutlineRow");
+  var videoOutlineFixEl = document.getElementById("videoOutlineFix");
   function requestSelectionSyncFromMain() {
     parent.postMessage({ pluginMessage: { type: "requestSelectionSync" } }, "*");
   }
@@ -271,6 +388,7 @@
     hintEl.textContent = message;
   }
   applyEl.onclick = () => {
+    var _a;
     const uniformGaps = uniformGapsEl.checked;
     const gapX = uniformGaps ? readPositiveInt(gapAllEl, 16) : readPositiveInt(gapXEl, 16);
     const gapY = uniformGaps ? readPositiveInt(gapAllEl, 16) : readPositiveInt(gapYEl, 16);
@@ -284,7 +402,9 @@
           uniformColumns: uniformEl.checked,
           uniformGaps,
           columnFillMode: readColumnFillMode(),
-          detectColumns: detectColumnsEl.checked
+          detectColumns: detectColumnsEl.checked,
+          lockBounds: lockBoundsEl.checked,
+          videoOutlineFix: (_a = videoOutlineFixEl == null ? void 0 : videoOutlineFixEl.checked) != null ? _a : false
         }
       },
       "*"
@@ -296,6 +416,15 @@
       return;
     }
     const count = msg.count;
+    const videoOutlineFixVisible = msg.videoOutlineFixVisible === true;
+    if (videoOutlineRow && videoOutlineFixEl) {
+      if (videoOutlineFixVisible) {
+        videoOutlineRow.style.display = "";
+      } else {
+        videoOutlineRow.style.display = "none";
+        videoOutlineFixEl.checked = false;
+      }
+    }
     const detected = msg.detectedColumns;
     if (detectColumnsEl.checked && detected != null) {
       columnsEl.value = String(detected);
@@ -303,17 +432,14 @@
     if (count < 2) {
       setApplyEnabled(false, "Select at least two layers.");
     } else {
-      setApplyEnabled(
-        true,
-        "Detect columns: Columns = layers on the top row (same y, 1px tol.), or 1 if fewer than two share that row."
-      );
+      setApplyEnabled(true, "Ready.");
     }
   };
 })();
 
-</script>\r
-  </body>\r
-</html>\r
+</script>
+  </body>
+</html>
 `;
 
   // src/masonry.ts
@@ -355,6 +481,46 @@
   }
   var MIN_SIZE = 0.01;
   var TOP_ROW_Y_TOLERANCE = 1;
+  var FIGJAM_MEDIA_DEFAULT_OUTLINE_STROKE_PX = 8;
+  function getEditorType() {
+    const f = globalThis.figma;
+    const t = f == null ? void 0 : f.editorType;
+    if (t === "figjam" || t === "figma" || t === "dev" || t === "slides" || t === "buzz") {
+      return t;
+    }
+    return "figma";
+  }
+  var VIDEO_FILENAME_EXT = /\.(mp4|mov|webm|mkv|m4v|avi)/i;
+  function isFigJamVideoMediaFile(node) {
+    if (getEditorType() !== "figjam") {
+      return false;
+    }
+    if (node.type !== "MEDIA") {
+      return false;
+    }
+    if (!hasLayout(node)) {
+      return false;
+    }
+    if ("name" in node && typeof node.name === "string") {
+      if (VIDEO_FILENAME_EXT.test(node.name)) {
+        return true;
+      }
+    }
+    const md = node.mediaData;
+    if (!md || typeof md.hash !== "string") {
+      return false;
+    }
+    const fig = globalThis.figma;
+    const get = fig == null ? void 0 : fig.getImageByHash;
+    if (typeof get !== "function") {
+      return false;
+    }
+    try {
+      return get.call(fig, md.hash) == null;
+    } catch (e) {
+      return false;
+    }
+  }
   function detectTopRowColumnCount(nodes) {
     if (nodes.length === 0) {
       return null;
@@ -377,13 +543,29 @@
     }
     return Math.min(24, topRow);
   }
-  function strokeOutsets(node) {
+  function strokeOutsets(node, videoOutlineFix) {
     const z = { top: 0, right: 0, bottom: 0, left: 0 };
+    if (videoOutlineFix && isFigJamVideoMediaFile(node)) {
+      const w = FIGJAM_MEDIA_DEFAULT_OUTLINE_STROKE_PX;
+      return { top: w, right: w, bottom: w, left: w };
+    }
     if (!("strokes" in node) || !("strokeAlign" in node)) {
       return z;
     }
-    if (node.strokes.length === 0) {
-      return z;
+    const strokes = node.strokes;
+    if (Array.isArray(strokes)) {
+      if (strokes.length === 0) {
+        return z;
+      }
+      const anyVisible = strokes.some((p) => {
+        const paint = p;
+        if (paint.visible === false) return false;
+        if (typeof paint.opacity === "number" && paint.opacity <= 0) return false;
+        return true;
+      });
+      if (!anyVisible) {
+        return z;
+      }
     }
     const align = node.strokeAlign;
     const f = align === "OUTSIDE" ? 1 : align === "CENTER" ? 0.5 : 0;
@@ -405,6 +587,9 @@
     } else {
       return z;
     }
+    if (topW <= 0 && rightW <= 0 && bottomW <= 0 && leftW <= 0) {
+      return z;
+    }
     return {
       top: topW * f,
       right: rightW * f,
@@ -412,11 +597,8 @@
       left: leftW * f
     };
   }
-  function layoutOutsets(node, uniformGaps) {
-    if (uniformGaps) {
-      return { top: 0, right: 0, bottom: 0, left: 0 };
-    }
-    return strokeOutsets(node);
+  function layoutOutsets(node, videoOutlineFix) {
+    return strokeOutsets(node, videoOutlineFix);
   }
   function compareTopLeft(a, b) {
     if (a.y !== b.y) {
@@ -425,6 +607,52 @@
     return a.x - b.x;
   }
   function fitWidthPreservingAspect(node, targetWidth) {
+    function readStrokeWeights(n) {
+      if (!("strokes" in n) || !("strokeAlign" in n)) {
+        return { kind: "none" };
+      }
+      if (n.strokes.length === 0) {
+        return { kind: "none" };
+      }
+      if ("strokeTopWeight" in n && typeof n.strokeTopWeight === "number") {
+        const s = n;
+        return {
+          kind: "individual",
+          top: s.strokeTopWeight,
+          right: s.strokeRightWeight,
+          bottom: s.strokeBottomWeight,
+          left: s.strokeLeftWeight
+        };
+      }
+      if ("strokeWeight" in n) {
+        const w2 = n.strokeWeight;
+        if (typeof w2 === "number" && Number.isFinite(w2)) {
+          return { kind: "uniform", weight: w2 };
+        }
+      }
+      return { kind: "none" };
+    }
+    function restoreStrokeWeights(n, state) {
+      if (state.kind === "none") return;
+      if (!("strokes" in n) || !("strokeAlign" in n)) return;
+      if (n.strokes.length === 0) return;
+      if (state.kind === "individual") {
+        if ("strokeTopWeight" in n && typeof n.strokeTopWeight === "number") {
+          const s = n;
+          s.strokeTopWeight = state.top;
+          s.strokeRightWeight = state.right;
+          s.strokeBottomWeight = state.bottom;
+          s.strokeLeftWeight = state.left;
+        }
+        return;
+      }
+      if ("strokeWeight" in n) {
+        const w2 = n.strokeWeight;
+        if (typeof w2 === "number") {
+          n.strokeWeight = state.weight;
+        }
+      }
+    }
     if (targetWidth < MIN_SIZE) {
       return;
     }
@@ -440,13 +668,31 @@
     if (scale < MIN_SIZE) {
       return;
     }
-    node.rescale(scale);
+    const strokeState = readStrokeWeights(node);
+    let rescaleFn;
+    try {
+      rescaleFn = node.rescale;
+    } catch (e) {
+      rescaleFn = void 0;
+    }
+    if (typeof rescaleFn === "function") {
+      try {
+        rescaleFn.call(node, scale);
+        restoreStrokeWeights(node, strokeState);
+        return;
+      } catch (e) {
+      }
+    }
+    const h = node.height;
+    const newW = Math.max(MIN_SIZE, targetWidth);
+    const newH = Math.max(MIN_SIZE, h * scale);
+    node.resize(newW, newH);
   }
-  function columnXStarts(left, targetW, gapX, uniformColumns, headersByCol, uniformGaps) {
+  function columnXStarts(left, targetW, gapX, uniformColumns, headersByCol, videoOutlineFix) {
     var _a;
     const cols = targetW.length;
     const xs = new Array(cols);
-    const out = (i) => i < headersByCol.length ? layoutOutsets(headersByCol[i], uniformGaps) : { top: 0, right: 0, bottom: 0, left: 0 };
+    const out = (i) => i < headersByCol.length ? layoutOutsets(headersByCol[i], videoOutlineFix) : { top: 0, right: 0, bottom: 0, left: 0 };
     xs[0] = left;
     if (uniformColumns) {
       const w = (_a = targetW[0]) != null ? _a : 0;
@@ -465,7 +711,7 @@
     }
     return xs;
   }
-  function buildColumnStacks(nodes, colCount, gapY, columnFillMode, uniformGaps) {
+  function buildColumnStacks(nodes, colCount, gapY, columnFillMode, videoOutlineFix) {
     const sorted = [...nodes].sort(compareTopLeft);
     const headerCount = Math.min(colCount, nodes.length);
     const rawHeaders = sorted.slice(0, headerCount);
@@ -480,7 +726,7 @@
     for (let c = 0; c < headersByCol.length; c++) {
       const h = headersByCol[c];
       stacks[c].push(h);
-      const o = layoutOutsets(h, uniformGaps);
+      const o = layoutOutsets(h, videoOutlineFix);
       colHeights[c] = h.height + o.bottom + gapY;
     }
     const remaining = nodes.filter((n) => !headerSet.has(n));
@@ -539,20 +785,21 @@
         }
       }
       stacks[bestCol].push(node);
-      const o = layoutOutsets(node, uniformGaps);
+      const o = layoutOutsets(node, videoOutlineFix);
       colHeights[bestCol] += o.top + node.height + o.bottom + gapY;
     }
     return { stacks, headersByCol };
   }
-  function computeMasonryLayout(nodes, columns, gapX, gapY, uniformColumns, columnFillMode, uniformGaps) {
+  function computeMasonryLayout(nodes, columns, gapX, gapY, uniformColumns, columnFillMode, uniformGaps, lockBounds = false, videoOutlineFix = false) {
+    var _a, _b, _c;
     const safeCols = Math.max(1, Math.floor(columns));
-    const { left, top } = selectionBounds(nodes);
+    const { left, top, width: boundsWidth } = selectionBounds(nodes);
     const { stacks, headersByCol } = buildColumnStacks(
       nodes,
       safeCols,
       gapY,
       columnFillMode,
-      uniformGaps
+      videoOutlineFix
     );
     const refW = new Array(safeCols).fill(0);
     for (let c = 0; c < headersByCol.length; c++) {
@@ -580,6 +827,36 @@
         targetW[c] = refW[c] > MIN_SIZE ? refW[c] : 0;
       }
     }
+    if (lockBounds && safeCols >= 1) {
+      const out = (i) => i < headersByCol.length ? layoutOutsets(headersByCol[i], videoOutlineFix) : { top: 0, right: 0, bottom: 0, left: 0 };
+      let fixedSpacing = 0;
+      for (let c = 1; c < safeCols; c++) {
+        fixedSpacing += out(c - 1).right + gapX + out(c).left;
+      }
+      let sumWidths = 0;
+      if (uniformColumns) {
+        sumWidths = ((_a = targetW[0]) != null ? _a : 0) * safeCols;
+      } else {
+        for (let c = 0; c < safeCols; c++) sumWidths += (_b = targetW[c]) != null ? _b : 0;
+      }
+      const available = boundsWidth - fixedSpacing;
+      if (available < MIN_SIZE * safeCols || sumWidths < MIN_SIZE) {
+        return {
+          ok: false,
+          reason: "Lock bounds failed: selection is too narrow for the current columns/gap settings."
+        };
+      }
+      const scale = available / sumWidths;
+      if (!Number.isFinite(scale) || scale < MIN_SIZE) {
+        return {
+          ok: false,
+          reason: "Lock bounds failed: invalid scaling factor for current selection bounds."
+        };
+      }
+      for (let c = 0; c < safeCols; c++) {
+        targetW[c] = Math.max(MIN_SIZE, ((_c = targetW[c]) != null ? _c : 0) * scale);
+      }
+    }
     for (let c = 0; c < safeCols; c++) {
       const tw = targetW[c];
       for (const node of stacks[c]) {
@@ -592,7 +869,7 @@
       gapX,
       uniformColumns,
       headersByCol,
-      uniformGaps
+      videoOutlineFix
     );
     const placements = [];
     for (let c = 0; c < safeCols; c++) {
@@ -601,7 +878,7 @@
       let prevOutBottom = 0;
       let isFirst = true;
       for (const node of stacks[c]) {
-        const o = layoutOutsets(node, uniformGaps);
+        const o = layoutOutsets(node, videoOutlineFix);
         const y = isFirst ? top : prevY + prevH + prevOutBottom + gapY + o.top;
         placements.push({ node, x: colXs[c], y });
         isFirst = false;
@@ -616,7 +893,7 @@
   // src/code.ts
   figma.showUI(inlined_ui_html_default, {
     width: 280,
-    height: 385,
+    height: 430,
     themeColors: true
   });
   function pushSelectionState() {
@@ -631,11 +908,24 @@
     figma.ui.postMessage({
       type: "selection",
       count: raw.length,
-      detectedColumns
+      detectedColumns,
+      editorType: figma.editorType,
+      videoOutlineFixVisible: selectionIncludesFigJamVideoMedia(raw)
     });
   }
   figma.on("selectionchange", pushSelectionState);
   pushSelectionState();
+  function selectionIncludesFigJamVideoMedia(raw) {
+    if (figma.editorType !== "figjam") {
+      return false;
+    }
+    for (const n of raw) {
+      if (isFigJamVideoMediaFile(n)) {
+        return true;
+      }
+    }
+    return false;
+  }
   figma.ui.onmessage = (msg) => {
     var _a;
     if (msg.type === "requestSelectionSync") {
@@ -674,6 +964,8 @@
     const gapX = Math.max(0, Math.min(999, Number(msg.gapX) || 0));
     const gapY = Math.max(0, Math.min(999, Number(msg.gapY) || 0));
     const fillMode = msg.columnFillMode === "nearestColumn" ? "nearestColumn" : "nearestWidth";
+    const selectionHasVideoMedia = selectionIncludesFigJamVideoMedia(raw);
+    const videoOutlineFix = figma.editorType === "figjam" && Boolean(msg.videoOutlineFix) && selectionHasVideoMedia;
     let result;
     try {
       result = computeMasonryLayout(
@@ -683,7 +975,9 @@
         gapY,
         Boolean(msg.uniformColumns),
         fillMode,
-        Boolean(msg.uniformGaps)
+        Boolean(msg.uniformGaps),
+        Boolean(msg.lockBounds),
+        videoOutlineFix
       );
     } catch (e) {
       const m = e instanceof Error ? e.message : String(e);
@@ -698,6 +992,6 @@
       node.x = x;
       node.y = y;
     }
-    figma.notify("Masonry layout applied.");
+    figma.notify("Layout applied.");
   };
 })();

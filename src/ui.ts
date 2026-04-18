@@ -9,6 +9,9 @@ const hintEl = document.getElementById("hint") as HTMLParagraphElement;
 const uniformEl = document.getElementById("uniformColumns") as HTMLInputElement;
 const uniformGapsEl = document.getElementById("uniformGaps") as HTMLInputElement;
 const detectColumnsEl = document.getElementById("detectColumns") as HTMLInputElement;
+const lockBoundsEl = document.getElementById("lockBounds") as HTMLInputElement;
+const videoOutlineRow = document.getElementById("videoOutlineRow") as HTMLDivElement | null;
+const videoOutlineFixEl = document.getElementById("videoOutlineFix") as HTMLInputElement | null;
 
 function requestSelectionSyncFromMain(): void {
   parent.postMessage({ pluginMessage: { type: "requestSelectionSync" } }, "*");
@@ -82,6 +85,8 @@ applyEl.onclick = () => {
         uniformGaps,
         columnFillMode: readColumnFillMode(),
         detectColumns: detectColumnsEl.checked,
+        lockBounds: lockBoundsEl.checked,
+        videoOutlineFix: videoOutlineFixEl?.checked ?? false,
       },
     },
     "*"
@@ -94,6 +99,15 @@ window.onmessage = (event: MessageEvent) => {
     return;
   }
   const count = msg.count as number;
+  const videoOutlineFixVisible = msg.videoOutlineFixVisible === true;
+  if (videoOutlineRow && videoOutlineFixEl) {
+    if (videoOutlineFixVisible) {
+      videoOutlineRow.style.display = "";
+    } else {
+      videoOutlineRow.style.display = "none";
+      videoOutlineFixEl.checked = false;
+    }
+  }
   const detected = msg.detectedColumns as number | null | undefined;
   if (detectColumnsEl.checked && detected != null) {
     columnsEl.value = String(detected);
@@ -101,9 +115,6 @@ window.onmessage = (event: MessageEvent) => {
   if (count < 2) {
     setApplyEnabled(false, "Select at least two layers.");
   } else {
-    setApplyEnabled(
-      true,
-      "Detect columns: Columns = layers on the top row (same y, 1px tol.), or 1 if fewer than two share that row."
-    );
+    setApplyEnabled(true, "Ready.");
   }
 };

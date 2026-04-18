@@ -5,11 +5,12 @@ import {
   detectTopRowColumnCount,
   getSharedParent,
   hasLayout,
+  isFigJamVideoMediaFile,
 } from "./masonry";
 
 figma.showUI(uiHtml, {
   width: 280,
-  height: 385,
+  height: 430,
   themeColors: true,
 });
 
@@ -27,11 +28,25 @@ function pushSelectionState() {
     type: "selection",
     count: raw.length,
     detectedColumns,
+    editorType: figma.editorType,
+    videoOutlineFixVisible: selectionIncludesFigJamVideoMedia(raw),
   });
 }
 
 figma.on("selectionchange", pushSelectionState);
 pushSelectionState();
+
+function selectionIncludesFigJamVideoMedia(raw: readonly SceneNode[]): boolean {
+  if (figma.editorType !== "figjam") {
+    return false;
+  }
+  for (const n of raw) {
+    if (isFigJamVideoMediaFile(n)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 type ApplyMessage = {
   type: "apply";
@@ -42,6 +57,8 @@ type ApplyMessage = {
   uniformGaps: boolean;
   columnFillMode: ColumnFillMode;
   detectColumns: boolean;
+  lockBounds: boolean;
+  videoOutlineFix?: boolean;
 };
 
 type RequestSyncMessage = { type: "requestSelectionSync" };
@@ -91,6 +108,12 @@ figma.ui.onmessage = (msg: ApplyMessage | RequestSyncMessage) => {
   const fillMode: ColumnFillMode =
     msg.columnFillMode === "nearestColumn" ? "nearestColumn" : "nearestWidth";
 
+  const selectionHasVideoMedia = selectionIncludesFigJamVideoMedia(raw);
+  const videoOutlineFix =
+    figma.editorType === "figjam" &&
+    Boolean(msg.videoOutlineFix) &&
+    selectionHasVideoMedia;
+
   let result: ReturnType<typeof computeMasonryLayout>;
   try {
     result = computeMasonryLayout(
@@ -100,7 +123,9 @@ figma.ui.onmessage = (msg: ApplyMessage | RequestSyncMessage) => {
       gapY,
       Boolean(msg.uniformColumns),
       fillMode,
-      Boolean(msg.uniformGaps)
+      Boolean(msg.uniformGaps),
+      Boolean(msg.lockBounds),
+      videoOutlineFix
     );
   } catch (e) {
     const m = e instanceof Error ? e.message : String(e);
@@ -116,5 +141,5 @@ figma.ui.onmessage = (msg: ApplyMessage | RequestSyncMessage) => {
     node.y = y;
   }
 
-  figma.notify("Masonry layout applied.");
+  figma.notify("Layout applied.");
 };

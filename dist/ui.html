@@ -118,6 +118,12 @@
         font-weight: 500;
         flex: 1;
       }
+      .checkbox-row label.video-outline-label {
+        font-weight: 700;
+      }
+      .pre-apply-block {
+        margin-bottom: 8px;
+      }
       .checkbox-row input[type="checkbox"] {
         flex-shrink: 0;
       }
@@ -145,38 +151,114 @@
   <body>
     <div class="row">
       <div class="labeled-row">
-        <label for="columns">Columns</label>
-        <input id="columns" type="number" min="1" max="24" value="3" />
+        <label for="columns" title="How many columns to flow items into.">Columns</label>
+        <input
+          id="columns"
+          type="number"
+          min="1"
+          max="24"
+          value="3"
+          title="How many columns to flow items into."
+        />
       </div>
       <div class="checkbox-row">
-        <label for="uniformColumns">Uniform columns</label>
-        <input id="uniformColumns" type="checkbox" />
+        <label
+          for="uniformColumns"
+          title="Use the same column width for every column (based on the widest header)."
+          >Uniform columns</label
+        >
+        <input
+          id="uniformColumns"
+          type="checkbox"
+          title="Use the same column width for every column (based on the widest header)."
+        />
       </div>
       <div class="checkbox-row">
-        <label for="detectColumns">Detect columns</label>
-        <input id="detectColumns" type="checkbox" />
+        <label
+          for="lockBounds"
+          title="Keep the selection’s overall width the same by scaling column widths to fit within the original bounds."
+          >Lock bounds</label
+        >
+        <input
+          id="lockBounds"
+          type="checkbox"
+          title="Keep the selection’s overall width the same by scaling column widths to fit within the original bounds."
+        />
+      </div>
+      <div class="checkbox-row">
+        <label
+          for="detectColumns"
+          title="Auto-set Columns based on how many selected layers share the top row (same y within 1px). If fewer than two share that row, uses 1."
+          >Detect columns</label
+        >
+        <input
+          id="detectColumns"
+          type="checkbox"
+          title="Auto-set Columns based on how many selected layers share the top row (same y within 1px). If fewer than two share that row, uses 1."
+        />
       </div>
     </div>
     <div class="row">
       <div id="gapSplitSection">
         <div class="labeled-row">
-          <label for="gapX">Horizontal gap</label>
-          <input id="gapX" type="number" min="0" max="999" value="16" />
+          <label
+            for="gapX"
+            title="Horizontal space between columns, measured between visible stroke edges when strokes are enabled."
+            >Horizontal gap</label
+          >
+          <input
+            id="gapX"
+            type="number"
+            min="0"
+            max="999"
+            value="16"
+            title="Horizontal space between columns, measured between visible stroke edges when strokes are enabled."
+          />
         </div>
         <div class="labeled-row">
-          <label for="gapY">Vertical gap</label>
-          <input id="gapY" type="number" min="0" max="999" value="16" />
+          <label
+            for="gapY"
+            title="Vertical space between items in a column, measured between visible stroke edges when strokes are enabled."
+            >Vertical gap</label
+          >
+          <input
+            id="gapY"
+            type="number"
+            min="0"
+            max="999"
+            value="16"
+            title="Vertical space between items in a column, measured between visible stroke edges when strokes are enabled."
+          />
         </div>
       </div>
       <div id="gapUnifiedSection" style="display: none">
         <div class="labeled-row">
-          <label for="gapAll">Gap</label>
-          <input id="gapAll" type="number" min="0" max="999" value="16" />
+          <label
+            for="gapAll"
+            title="Single gap value used for both horizontal and vertical spacing."
+            >Gap</label
+          >
+          <input
+            id="gapAll"
+            type="number"
+            min="0"
+            max="999"
+            value="16"
+            title="Single gap value used for both horizontal and vertical spacing."
+          />
         </div>
       </div>
       <div class="checkbox-row">
-        <label for="uniformGaps">Uniform gaps</label>
-        <input id="uniformGaps" type="checkbox" />
+        <label
+          for="uniformGaps"
+          title="Use one gap value for both horizontal and vertical gaps."
+          >Uniform gaps</label
+        >
+        <input
+          id="uniformGaps"
+          type="checkbox"
+          title="Use one gap value for both horizontal and vertical gaps."
+        />
       </div>
     </div>
     <div class="row">
@@ -184,28 +266,60 @@
         <summary>Arrange by</summary>
         <div class="group-body">
           <div class="radio-option">
-            <label for="fillNearestWidth">Nearest width</label>
+            <label
+              for="fillNearestWidth"
+              title="Assign items to the column whose header width is closest to the item’s current width."
+              >Nearest width</label
+            >
             <input
               id="fillNearestWidth"
               type="radio"
               name="columnFillMode"
               value="nearestWidth"
               checked
+              title="Assign items to the column whose header width is closest to the item’s current width."
             />
           </div>
           <div class="radio-option">
-            <label for="fillNearestColumn">Nearest column</label>
+            <label
+              for="fillNearestColumn"
+              title="Assign items to the nearest column horizontally (based on distance to the column header’s center)."
+              >Nearest column</label
+            >
             <input
               id="fillNearestColumn"
               type="radio"
               name="columnFillMode"
               value="nearestColumn"
+              title="Assign items to the nearest column horizontally (based on distance to the column header’s center)."
             />
           </div>
         </div>
       </details>
     </div>
-    <button id="apply" type="button" disabled>Apply masonry</button>
+    <div id="videoOutlineRow" class="pre-apply-block" style="display: none">
+      <div class="checkbox-row">
+        <label
+          class="video-outline-label"
+          for="videoOutlineFix"
+          title="FigJam does not expose strokes on video media. Turn on to add 8px outline spacing in gap math so layout matches what you see on the board."
+          >Video Outline Fix</label
+        >
+        <input
+          id="videoOutlineFix"
+          type="checkbox"
+          title="FigJam does not expose strokes on video media. Turn on to add 8px outline spacing in gap math so layout matches what you see on the board."
+        />
+      </div>
+    </div>
+    <button
+      id="apply"
+      type="button"
+      disabled
+      title="Apply the layout to the current selection."
+    >
+      Apply layout
+    </button>
     <p class="hint" id="hint">Select at least two layers with the same parent.</p>
     <script>
 "use strict";
@@ -222,6 +336,9 @@
   var uniformEl = document.getElementById("uniformColumns");
   var uniformGapsEl = document.getElementById("uniformGaps");
   var detectColumnsEl = document.getElementById("detectColumns");
+  var lockBoundsEl = document.getElementById("lockBounds");
+  var videoOutlineRow = document.getElementById("videoOutlineRow");
+  var videoOutlineFixEl = document.getElementById("videoOutlineFix");
   function requestSelectionSyncFromMain() {
     parent.postMessage({ pluginMessage: { type: "requestSelectionSync" } }, "*");
   }
@@ -268,6 +385,7 @@
     hintEl.textContent = message;
   }
   applyEl.onclick = () => {
+    var _a;
     const uniformGaps = uniformGapsEl.checked;
     const gapX = uniformGaps ? readPositiveInt(gapAllEl, 16) : readPositiveInt(gapXEl, 16);
     const gapY = uniformGaps ? readPositiveInt(gapAllEl, 16) : readPositiveInt(gapYEl, 16);
@@ -281,7 +399,9 @@
           uniformColumns: uniformEl.checked,
           uniformGaps,
           columnFillMode: readColumnFillMode(),
-          detectColumns: detectColumnsEl.checked
+          detectColumns: detectColumnsEl.checked,
+          lockBounds: lockBoundsEl.checked,
+          videoOutlineFix: (_a = videoOutlineFixEl == null ? void 0 : videoOutlineFixEl.checked) != null ? _a : false
         }
       },
       "*"
@@ -293,6 +413,15 @@
       return;
     }
     const count = msg.count;
+    const videoOutlineFixVisible = msg.videoOutlineFixVisible === true;
+    if (videoOutlineRow && videoOutlineFixEl) {
+      if (videoOutlineFixVisible) {
+        videoOutlineRow.style.display = "";
+      } else {
+        videoOutlineRow.style.display = "none";
+        videoOutlineFixEl.checked = false;
+      }
+    }
     const detected = msg.detectedColumns;
     if (detectColumnsEl.checked && detected != null) {
       columnsEl.value = String(detected);
@@ -300,10 +429,7 @@
     if (count < 2) {
       setApplyEnabled(false, "Select at least two layers.");
     } else {
-      setApplyEnabled(
-        true,
-        "Detect columns: Columns = layers on the top row (same y, 1px tol.), or 1 if fewer than two share that row."
-      );
+      setApplyEnabled(true, "Ready.");
     }
   };
 })();

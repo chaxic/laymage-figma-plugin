@@ -12,6 +12,9 @@
   var uniformEl = document.getElementById("uniformColumns");
   var uniformGapsEl = document.getElementById("uniformGaps");
   var detectColumnsEl = document.getElementById("detectColumns");
+  var lockBoundsEl = document.getElementById("lockBounds");
+  var videoOutlineRow = document.getElementById("videoOutlineRow");
+  var videoOutlineFixEl = document.getElementById("videoOutlineFix");
   function requestSelectionSyncFromMain() {
     parent.postMessage({ pluginMessage: { type: "requestSelectionSync" } }, "*");
   }
@@ -58,6 +61,7 @@
     hintEl.textContent = message;
   }
   applyEl.onclick = () => {
+    var _a;
     const uniformGaps = uniformGapsEl.checked;
     const gapX = uniformGaps ? readPositiveInt(gapAllEl, 16) : readPositiveInt(gapXEl, 16);
     const gapY = uniformGaps ? readPositiveInt(gapAllEl, 16) : readPositiveInt(gapYEl, 16);
@@ -71,7 +75,9 @@
           uniformColumns: uniformEl.checked,
           uniformGaps,
           columnFillMode: readColumnFillMode(),
-          detectColumns: detectColumnsEl.checked
+          detectColumns: detectColumnsEl.checked,
+          lockBounds: lockBoundsEl.checked,
+          videoOutlineFix: (_a = videoOutlineFixEl == null ? void 0 : videoOutlineFixEl.checked) != null ? _a : false
         }
       },
       "*"
@@ -83,6 +89,15 @@
       return;
     }
     const count = msg.count;
+    const videoOutlineFixVisible = msg.videoOutlineFixVisible === true;
+    if (videoOutlineRow && videoOutlineFixEl) {
+      if (videoOutlineFixVisible) {
+        videoOutlineRow.style.display = "";
+      } else {
+        videoOutlineRow.style.display = "none";
+        videoOutlineFixEl.checked = false;
+      }
+    }
     const detected = msg.detectedColumns;
     if (detectColumnsEl.checked && detected != null) {
       columnsEl.value = String(detected);
@@ -90,10 +105,7 @@
     if (count < 2) {
       setApplyEnabled(false, "Select at least two layers.");
     } else {
-      setApplyEnabled(
-        true,
-        "Detect columns: Columns = layers on the top row (same y, 1px tol.), or 1 if fewer than two share that row."
-      );
+      setApplyEnabled(true, "Ready.");
     }
   };
 })();

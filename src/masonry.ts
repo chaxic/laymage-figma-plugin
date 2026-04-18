@@ -59,6 +59,67 @@ const MIN_SIZE = 0.01;
 const TOP_ROW_Y_TOLERANCE = 1;
 
 /**
+ * FigJam `MEDIA` nodes do not expose stroke fields in the plugin API, but they can still
+ * show an outline in the editor. Pasting into Figma Design often yields stroke weight 8,
+ * so we use that as a layout-only approximation for gap spacing when the user enables
+ * “FigJam Video Outline Fix”.
+ */
+const FIGJAM_MEDIA_DEFAULT_OUTLINE_STROKE_PX = 8;
+
+function getEditorType():
+  | "figma"
+  | "figjam"
+  | "dev"
+  | "slides"
+  | "buzz" {
+  const f = (globalThis as unknown as { figma?: { editorType?: string } }).figma;
+  const t = f?.editorType;
+  if (t === "figjam" || t === "figma" || t === "dev" || t === "slides" || t === "buzz") {
+    return t;
+  }
+  return "figma";
+}
+
+/** Filename hints for FigJam video media when the API does not expose MIME type. */
+const VIDEO_FILENAME_EXT = /\.(mp4|mov|webm|mkv|m4v|avi)/i;
+
+/**
+ * FigJam `MediaData` only exposes a hash. Video items often have no `getImageByHash` entry
+ * (no raster preview), while images typically do. We also treat obvious video filenames as video.
+ */
+export function isFigJamVideoMediaFile(node: SceneNode): boolean {
+  if (getEditorType() !== "figjam") {
+    return false;
+  }
+  if ((node as { type?: string }).type !== "MEDIA") {
+    return false;
+  }
+  if (!hasLayout(node)) {
+    return false;
+  }
+  if ("name" in node && typeof (node as { name?: string }).name === "string") {
+    if (VIDEO_FILENAME_EXT.test((node as { name: string }).name)) {
+      return true;
+    }
+  }
+  const md = (node as { mediaData?: { hash?: string } }).mediaData;
+  if (!md || typeof md.hash !== "string") {
+    return false;
+  }
+  const fig = (globalThis as unknown as { figma?: { getImageByHash?: (h: string) => unknown } })
+    .figma;
+  const get = fig?.getImageByHash;
+  if (typeof get !== "function") {
+    return false;
+  }
+  try {
+    return get.call(fig, md.hash) == null;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Counts layers on the top row (same top y within tolerance).
  * If at least two share that row, returns that count (capped at 24).
  * Otherwise returns 1. Empty input returns null.
@@ -92,19 +153,42 @@ export function detectTopRowColumnCount(
  * Outside/Center stroke extends past layout width/height; inside does not.
  * Used so gapX/gapY measure visual space between stroke edges.
  */
-function strokeOutsets(node: SceneNode & LayoutMixin): {
+function strokeOutsets(
+  node: SceneNode & LayoutMixin,
+  videoOutlineFix: boolean
+): {
   top: number;
   right: number;
   bottom: number;
   left: number;
 } {
   const z = { top: 0, right: 0, bottom: 0, left: 0 };
+  // FigJam video media: no stroke API; optional 8px outline approximation for gap math.
+  if (videoOutlineFix && isFigJamVideoMediaFile(node)) {
+    const w = FIGJAM_MEDIA_DEFAULT_OUTLINE_STROKE_PX;
+    return { top: w, right: w, bottom: w, left: w };
+  }
   if (!("strokes" in node) || !("strokeAlign" in node)) {
     return z;
   }
-  if (node.strokes.length === 0) {
-    return z;
+  // If strokes are hidden/disabled, ignore them in spacing.
+  // Note: typings can vary (sometimes `strokes` can be mixed). We handle unknown types safely.
+  const strokes = (node as unknown as { strokes: unknown }).strokes;
+  if (Array.isArray(strokes)) {
+    if (strokes.length === 0) {
+      return z;
+    }
+    const anyVisible = (strokes as readonly Paint[]).some((p) => {
+      const paint = p as Paint & { visible?: boolean; opacity?: number };
+      if (paint.visible === false) return false;
+      if (typeof paint.opacity === "number" && paint.opacity <= 0) return false;
+      return true;
+    });
+    if (!anyVisible) {
+      return z;
+    }
   }
+  // If strokes are mixed/unknown, conservatively assume they may be visible.
   const align = node.strokeAlign;
   const f = align === "OUTSIDE" ? 1 : align === "CENTER" ? 0.5 : 0;
   if (f === 0) {
@@ -130,6 +214,10 @@ function strokeOutsets(node: SceneNode & LayoutMixin): {
     return z;
   }
 
+  if (topW <= 0 && rightW <= 0 && bottomW <= 0 && leftW <= 0) {
+    return z;
+  }
+
   return {
     top: topW * f,
     right: rightW * f,
@@ -138,20 +226,17 @@ function strokeOutsets(node: SceneNode & LayoutMixin): {
   };
 }
 
-/** When true, gapX/gapY are between layout edges only (ignore border/stroke outsets). */
+/** Stroke outsets used so gaps measure visual space between stroke edges. */
 function layoutOutsets(
   node: SceneNode & LayoutMixin,
-  uniformGaps: boolean
+  videoOutlineFix: boolean
 ): {
   top: number;
   right: number;
   bottom: number;
   left: number;
 } {
-  if (uniformGaps) {
-    return { top: 0, right: 0, bottom: 0, left: 0 };
-  }
-  return strokeOutsets(node);
+  return strokeOutsets(node, videoOutlineFix);
 }
 
 function compareTopLeft(
@@ -172,6 +257,68 @@ function fitWidthPreservingAspect(
   node: SceneNode & LayoutMixin,
   targetWidth: number
 ): void {
+  function readStrokeWeights(
+    n: SceneNode & LayoutMixin
+  ):
+    | { kind: "none" }
+    | { kind: "uniform"; weight: number }
+    | { kind: "individual"; top: number; right: number; bottom: number; left: number } {
+    if (!("strokes" in n) || !("strokeAlign" in n)) {
+      return { kind: "none" };
+    }
+    if (n.strokes.length === 0) {
+      return { kind: "none" };
+    }
+    if (
+      "strokeTopWeight" in n &&
+      typeof (n as IndividualStrokesMixin).strokeTopWeight === "number"
+    ) {
+      const s = n as IndividualStrokesMixin;
+      return {
+        kind: "individual",
+        top: s.strokeTopWeight,
+        right: s.strokeRightWeight,
+        bottom: s.strokeBottomWeight,
+        left: s.strokeLeftWeight,
+      };
+    }
+    if ("strokeWeight" in n) {
+      const w = (n as GeometryMixin).strokeWeight;
+      if (typeof w === "number" && Number.isFinite(w)) {
+        return { kind: "uniform", weight: w };
+      }
+    }
+    return { kind: "none" };
+  }
+
+  function restoreStrokeWeights(
+    n: SceneNode & LayoutMixin,
+    state:
+      | { kind: "none" }
+      | { kind: "uniform"; weight: number }
+      | { kind: "individual"; top: number; right: number; bottom: number; left: number }
+  ): void {
+    if (state.kind === "none") return;
+    if (!("strokes" in n) || !("strokeAlign" in n)) return;
+    if (n.strokes.length === 0) return;
+    if (state.kind === "individual") {
+      if ("strokeTopWeight" in n && typeof (n as IndividualStrokesMixin).strokeTopWeight === "number") {
+        const s = n as IndividualStrokesMixin;
+        s.strokeTopWeight = state.top;
+        s.strokeRightWeight = state.right;
+        s.strokeBottomWeight = state.bottom;
+        s.strokeLeftWeight = state.left;
+      }
+      return;
+    }
+    if ("strokeWeight" in n) {
+      const w = (n as GeometryMixin).strokeWeight;
+      if (typeof w === "number") {
+        (n as GeometryMixin).strokeWeight = state.weight;
+      }
+    }
+  }
+
   if (targetWidth < MIN_SIZE) {
     return;
   }
@@ -187,7 +334,29 @@ function fitWidthPreservingAspect(
   if (scale < MIN_SIZE) {
     return;
   }
-  node.rescale(scale);
+  const strokeState = readStrokeWeights(node);
+
+  // FigJam `MEDIA` nodes do not implement `rescale()`; reading the property can throw.
+  let rescaleFn: unknown;
+  try {
+    rescaleFn = (node as unknown as { rescale?: unknown }).rescale;
+  } catch {
+    rescaleFn = undefined;
+  }
+  if (typeof rescaleFn === "function") {
+    try {
+      (rescaleFn as (s: number) => void).call(node, scale);
+      restoreStrokeWeights(node, strokeState);
+      return;
+    } catch {
+      // fall through to resize-based scaling
+    }
+  }
+
+  const h = node.height;
+  const newW = Math.max(MIN_SIZE, targetWidth);
+  const newH = Math.max(MIN_SIZE, h * scale);
+  node.resize(newW, newH);
 }
 
 function columnXStarts(
@@ -196,13 +365,13 @@ function columnXStarts(
   gapX: number,
   uniformColumns: boolean,
   headersByCol: readonly (SceneNode & LayoutMixin)[],
-  uniformGaps: boolean
+  videoOutlineFix: boolean
 ): number[] {
   const cols = targetW.length;
   const xs = new Array<number>(cols);
   const out = (i: number) =>
     i < headersByCol.length
-      ? layoutOutsets(headersByCol[i], uniformGaps)
+      ? layoutOutsets(headersByCol[i], videoOutlineFix)
       : { top: 0, right: 0, bottom: 0, left: 0 };
 
   xs[0] = left;
@@ -244,7 +413,7 @@ function buildColumnStacks(
   colCount: number,
   gapY: number,
   columnFillMode: ColumnFillMode,
-  uniformGaps: boolean
+  videoOutlineFix: boolean
 ): {
   stacks: (SceneNode & LayoutMixin)[][];
   headersByCol: (SceneNode & LayoutMixin)[];
@@ -266,7 +435,7 @@ function buildColumnStacks(
   for (let c = 0; c < headersByCol.length; c++) {
     const h = headersByCol[c];
     stacks[c].push(h);
-    const o = layoutOutsets(h, uniformGaps);
+    const o = layoutOutsets(h, videoOutlineFix);
     colHeights[c] = h.height + o.bottom + gapY;
   }
 
@@ -336,7 +505,7 @@ function buildColumnStacks(
       }
     }
     stacks[bestCol].push(node);
-    const o = layoutOutsets(node, uniformGaps);
+    const o = layoutOutsets(node, videoOutlineFix);
     colHeights[bestCol] += o.top + node.height + o.bottom + gapY;
   }
 
@@ -354,17 +523,19 @@ export function computeMasonryLayout(
   gapY: number,
   uniformColumns: boolean,
   columnFillMode: ColumnFillMode,
-  uniformGaps: boolean
+  uniformGaps: boolean,
+  lockBounds: boolean = false,
+  videoOutlineFix: boolean = false
 ): MasonryResult {
   const safeCols = Math.max(1, Math.floor(columns));
-  const { left, top } = selectionBounds(nodes);
+  const { left, top, width: boundsWidth } = selectionBounds(nodes);
 
   const { stacks, headersByCol } = buildColumnStacks(
     nodes,
     safeCols,
     gapY,
     columnFillMode,
-    uniformGaps
+    videoOutlineFix
   );
 
   const refW = new Array<number>(safeCols).fill(0);
@@ -396,6 +567,47 @@ export function computeMasonryLayout(
     }
   }
 
+  if (lockBounds && safeCols >= 1) {
+    const out = (i: number) =>
+      i < headersByCol.length
+        ? layoutOutsets(headersByCol[i], videoOutlineFix)
+        : { top: 0, right: 0, bottom: 0, left: 0 };
+
+    let fixedSpacing = 0;
+    for (let c = 1; c < safeCols; c++) {
+      fixedSpacing += out(c - 1).right + gapX + out(c).left;
+    }
+
+    let sumWidths = 0;
+    if (uniformColumns) {
+      sumWidths = (targetW[0] ?? 0) * safeCols;
+    } else {
+      for (let c = 0; c < safeCols; c++) sumWidths += targetW[c] ?? 0;
+    }
+
+    const available = boundsWidth - fixedSpacing;
+    if (available < MIN_SIZE * safeCols || sumWidths < MIN_SIZE) {
+      return {
+        ok: false,
+        reason:
+          "Lock bounds failed: selection is too narrow for the current columns/gap settings.",
+      };
+    }
+
+    const scale = available / sumWidths;
+    if (!Number.isFinite(scale) || scale < MIN_SIZE) {
+      return {
+        ok: false,
+        reason:
+          "Lock bounds failed: invalid scaling factor for current selection bounds.",
+      };
+    }
+
+    for (let c = 0; c < safeCols; c++) {
+      targetW[c] = Math.max(MIN_SIZE, (targetW[c] ?? 0) * scale);
+    }
+  }
+
   for (let c = 0; c < safeCols; c++) {
     const tw = targetW[c];
     for (const node of stacks[c]) {
@@ -409,7 +621,7 @@ export function computeMasonryLayout(
     gapX,
     uniformColumns,
     headersByCol,
-    uniformGaps
+    videoOutlineFix
   );
   const placements: MasonryPlacement[] = [];
 
@@ -419,7 +631,7 @@ export function computeMasonryLayout(
     let prevOutBottom = 0;
     let isFirst = true;
     for (const node of stacks[c]) {
-      const o = layoutOutsets(node, uniformGaps);
+      const o = layoutOutsets(node, videoOutlineFix);
       const y = isFirst
         ? top
         : prevY + prevH + prevOutBottom + gapY + o.top;
